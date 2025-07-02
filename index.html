@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>3D Rotating Coral Card</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+  <style>
+    body {
+      background: #1c1c1c;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      perspective: 1500px;
+      padding: 40px;
+      box-sizing: border-box;
+    }
+
+    .card-container {
+      width: 100%;
+      max-width: 1000px;
+      height: 480px;
+      position: relative;
+      perspective: 1500px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      border-radius: 16px;
+      transform-style: preserve-3d;
+      transition: transform 0.8s ease;
+      box-shadow: 0 0 14px rgba(0,0,0,0.6);
+      cursor: default;
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-front,
+    .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      backface-visibility: hidden;
+      box-sizing: border-box;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      background-clip: padding-box;
+    }
+
+    .card-front {
+      background: linear-gradient(to bottom right, #000000, #0a1f3c);
+      border: 3px solid #00bfff;
+      display: flex;
+      flex-direction: row;
+      padding: 20px 30px;
+      gap: 30px;
+      color: #fff;
+    }
+
+    .column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .left {
+      text-align: center;
+      max-width: 240px;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid #00bfff;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+      margin-bottom: 14px;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    h2 {
+      font-size: 1.8em;
+      margin-bottom: 4px;
+    }
+
+    .title {
+      font-style: italic;
+      margin-bottom: 6px;
+      font-size: 1em;
+    }
+
+    .tag {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 10px;
+      margin: 2px;
+      border-radius: 6px;
+      font-size: 0.75em;
+      display: inline-block;
+    }
+
+    .section-title {
+      color: #00bfff;
+      font-weight: bold;
+      font-size: 1.1em;
+      margin: 12px 0;
+      width: 100%;
+      text-align: center;
+    }
+
+    .trait-box {
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 4px solid #00bfff;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #00bfff;
+      width: 100%;
+    }
+
+    .trait-box i {
+      min-width: 18px;
+      font-size: 1.1em;
+    }
+
+    .card-back {
+      background: linear-gradient(to bottom right, #000000, #0a1f3c);
+      border: 3px solid #00bfff;
+      color: #00bfff;
+      padding: 20px 30px;
+      display: flex;
+      flex-direction: column;
+      transform: rotateY(180deg);
+      overflow-y: auto;
+    }
+
+    .card-back .section-title {
+      font-weight: bold;
+      font-size: 1.4em;
+      margin-bottom: 12px;
+      text-align: center;
+      color: #00bfff;
+    }
+
+    .level-bar {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .level-label {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #00bfff;
+    }
+
+    .bar-container {
+      width: 80%;
+      height: 16px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      margin: 0 auto;
+      overflow: hidden;
+      box-shadow: 0 0 6px rgba(0, 191, 255, 0.3);
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(to right, #00bfff, #007acc);
+      border-radius: 10px 0 0 10px;
+      transition: width 0.4s ease-in-out;
+      width: 55%;
+    }
+
+    .columns {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .ability-group {
+      flex: 1;
+      min-width: 280px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .ability-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1em;
+      color: #00bfff;
+    }
+
+    .ability-title i {
+      font-size: 1.2em;
+    }
+
+    .ability-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95em;
+      margin-bottom: 10px;
+      color: #00bfff;
+    }
+
+    .ability-bar {
+      flex: 1;
+      height: 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: inset 0 0 4px rgba(0, 191, 255, 0.4);
+    }
+
+    .ability-fill {
+      height: 100%;
+      background: linear-gradient(to right, #00bfff, #007acc);
+      border-radius: 10px;
+      transition: width 0.4s ease-in-out;
+    }
+
+    .ability-percent {
+      width: 40px;
+      text-align: right;
+      font-size: 0.85em;
+    }
+
+    .card-front::-webkit-scrollbar,
+    .card-back::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .card-front::-webkit-scrollbar-thumb,
+    .card-back::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 191, 255, 0.4);
+      border-radius: 10px;
+    }
+
+    button#rotateBtn {
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #00bfff;
+      color: #1c1c1c;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 191, 255, 0.7);
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+
+    button#rotateBtn:hover {
+      background-color: #0080c0;
+      color: #fff;
+    }
+
+    @media (max-width: 900px) {
+      .card-front {
+        flex-direction: column;
+        padding: 20px;
+      }
+      .left {
+        max-width: 100%;
+        margin-bottom: 20px;
+      }
+      .columns {
+        flex-direction: column;
+      }
+      .ability-group {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card-container">
+    <div class="card" id="card">
+      <!-- Front Side -->
+      <div class="card-front">
+        <div class="column left">
+          <h2>Sugoie</h2>
+          <div class="avatar">
+            <img src="https://github.com/user-attachments/assets/4a278d56-793f-4d81-82c2-bd0ac60a4772" alt="Coral's Avatar" />
+          </div>
+          <div class="title">The Intellectual Mindseer</div>
+          <div class="tag">ENTJ – 5w4</div>
+          <div class="tag">Arcane Strategist</div>
+        </div>
+
+        <div class="column">
+          <div class="section-title">Skills</div>
+          <div class="trait-box"><i class="fas fa-brain"></i> Fast Learner – Instantly absorbs knowledge through observation.</div>
+          <div class="trait-box"><i class="fas fa-rotate"></i> Adaptive – Adjusts quickly to challenges and situations.</div>
+          <div class="trait-box"><i class="fas fa-chess-knight"></i> Manipulator – Can influence others if needed.</div>
+          <div class="trait-box"><i class="fas fa-mask"></i> Deceitful – Skilled at misdirection and trickery when necessary.</div>
+          <div class="trait-box"><i class="fas fa-theater-masks"></i> Joker Face – Can shift personas to fit the moment.</div>
+          <div class="trait-box"><i class="fas fa-eye"></i> Perceptive – Reads people and situations with precision.</div>
+        </div>
+
+        <div class="column">
+          <div class="section-title">Weaknesses</div>
+          <div class="trait-box"><i class="fas fa-crown"></i> Control Obsession – Must Control the situation.</div>
+          <div class="trait-box"><i class="fas fa-user-lock"></i> Emotionally Distant – Struggles to open up.</div>
+          <div class="trait-box"><i class="fas fa-hand-holding"></i> Uses People – Treats others like tools.</div>
+          <div class="trait-box"><i class="fas fa-circle-notch"></i> Overthinks – Gets lost in Analyzing.</div>
+          <div class="trait-box"><i class="fas fa-shield-alt"></i> Trust Issues – Rarely lets others in.</div>
+        </div>
+      </div>
+
+      <!-- Back Side -->
+      <div class="card-back">
+        <div class="section-title">Level & Abilities</div>
+        <div class="level-bar">
+          <div class="level-label">Level 11</div>
+          <div class="bar-container">
+            <div class="bar-fill" style="width: 55%;"></div>
+          </div>
+        </div>
+
+        <div class="columns">
+          <!-- Cognitive -->
+          <div class="ability-group">
+            <div class="ability-title"><i class="fas fa-brain"></i> Cognitive</div>
+            <div class="ability-item"><span>Attention</span><div class="ability-bar"><div class="ability-fill" style="width: 100%;"></div></div><span class="ability-percent">100%</span></div>
+            <div class="ability-item"><span>Memory</span><div class="ability-bar"><div class="ability-fill" style="width: 100%;"></div></div><span class="ability-percent">100%</span></div>
+            <div class="ability-item"><span>Problem-Solving</span><div class="ability-bar"><div class="ability-fill" style="width: 100%;"></div></div><span class="ability-percent">100%</span></div>
+            <div class="ability-item"><span>Processing Speed</span><div class="ability-bar"><div class="ability-fill" style="width: 100%;"></div></div><span class="ability-percent">100%</span></div>
+            <div class="ability-item"><span>Language</span><div class="ability-bar"><div class="ability-fill" style="width: 90%;"></div></div><span class="ability-percent">100%</span></div>
+            <div class="ability-item"><span>Planning & Organization</span><div class="ability-bar"><div class="ability-fill" style="width: 90%;"></div></div><span class="ability-percent">100%</span></div>
+          </div>
+
+          <!-- Emotional -->
+          <div class="ability-group">
+            <div class="ability-title"><i class="fas fa-heart"></i> Emotional</div>
+            <div class="ability-item"><span>Self-Awareness</span><div class="ability-bar"><div class="ability-fill" style="width: 80%;"></div></div><span class="ability-percent">80%</span></div>
+            <div class="ability-item"><span>Emotional Regulation</span><div class="ability-bar"><div class="ability-fill" style="width: 80%;"></div></div><span class="ability-percent">80%</span></div>
+            <div class="ability-item"><span>Empathy</span><div class="ability-bar"><div class="ability-fill" style="width: 60%;"></div></div><span class="ability-percent">60%</span></div>
+            <div class="ability-item"><span>Social Skills</span><div class="ability-bar"><div class="ability-fill" style="width: 80%;"></div></div><span class="ability-percent">80%</span></div>
+            <div class="ability-item"><span>Resilience</span><div class="ability-bar"><div class="ability-fill" style="width: 80%;"></div></div><span class="ability-percent">80%</span></div>
+            <div class="ability-item"><span>Motivation</span><div class="ability-bar"><div class="ability-fill" style="width: 80%;"></div></div><span class="ability-percent">80%</span></div>
+          </div>
+
+          <!-- Physical -->
+          <div class="ability-group">
+            <div class="ability-title"><i class="fas fa-dumbbell"></i> Physical</div>
+            <div class="ability-item"><span>Energy & Stamina</span><div class="ability-bar"><div class="ability-fill" style="width: 60%;"></div></div><span class="ability-percent">100%</span></div>
+            <div class="ability-item"><span>Coordination</span><div class="ability-bar"><div class="ability-fill" style="width: 60%;"></div></div><span class="ability-percent">100%</span></div>
+            <div class="ability-item"><span>Fine Motor Skills</span><div class="ability-bar"><div class="ability-fill" style="width: 70%;"></div></div><span class="ability-percent">100%</span></div>
+            <div class="ability-item"><span>Balance & Movement</span><div class="ability-bar"><div class="ability-fill" style="width: 100%;"></div></div><span class="ability-percent">100%</span></div>
+            <div class="ability-item"><span>Senses</span><div class="ability-bar"><div class="ability-fill" style="width: 100%;"></div></div><span class="ability-percent">100%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button id="rotateBtn">Rotate Card</button>
+
+  <script>
+    const card = document.getElementById('card');
+    const btn = document.getElementById('rotateBtn');
+    btn.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+    });
+  </script>
+</body>
+</html>
